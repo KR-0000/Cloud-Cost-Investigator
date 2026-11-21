@@ -91,6 +91,8 @@ class DashboardTests(unittest.TestCase):
     def test_default_dashboard_and_slider(self):
         app = AppTest.from_file(str(ROOT / "app.py"), default_timeout=15).run()
         self.assertEqual(len(app.exception), 0)
+        self.assertTrue(any("Sample data loaded" in item.value for item in app.success))
+        self.assertEqual(app.expander[0].label, "Use your own billing CSV (optional)")
         self.assertEqual(app.metric[0].value, "USD 20.52")
         self.assertTrue(any("primarily September" in item.value for item in app.info))
         app.slider[0].set_value(100).run()

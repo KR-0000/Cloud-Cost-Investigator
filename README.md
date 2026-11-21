@@ -18,13 +18,20 @@ Open [the local dashboard](http://localhost:8501). The dashboard can run offline
 .\.venv\Scripts\python.exe -m unittest -v
 ```
 
+## Try it in one minute
+
+The sample opens automatically. Start with **Overview**, open **Investigate** to see the biggest cost driver, then move the slider in **Savings scenario**. To analyze another bill, expand **Use your own billing CSV (optional)** below the dashboard.
+
+Read the [three-minute interview walkthrough](INTERVIEW_PREP.md#start-here-if-you-have-three-minutes) for the three ideas worth practicing first.
+
+<details>
+<summary>Dashboard calculations and CSV format</summary>
+
 ## What the dashboard shows
 
 - **Overview** sums invoice-basis `BilledCost` by provider and service, keeping signed credits and adjustments. The top five are ranked by net billed cost for each provider–service pair. Dates show daily totals grouped by the start of each charge in UTC. A charge spanning multiple days is assigned to its start date.
 - **Investigate** shows the largest pair’s share of all positive net pair totals. For adjacent, complete, comparable billing months, the app also flags increases of at least 30% and 50 units of the selected currency. A flag gives an engineer a starting point for checking usage, rates, commitments, and billing changes.
 - **Savings scenario** applies a chosen percentage to a positive net billed-cost baseline. The monthly label requires a confirmed complete billing month. The annualized estimate assumes that the same monthly savings repeat 12 times.
-
-Use the [interview prep guide](INTERVIEW_PREP.md) for worked calculations, practical FinOps concepts, and a 60–90-second demo.
 
 ## CSV inputs and assumptions
 
@@ -33,6 +40,8 @@ Use a UTF-8, comma-separated file with `BilledCost`, `BillingCurrency`, `Provide
 The app analyzes one file and one currency at a time. Blank provider or service labels become `Unknown`. Invalid costs and blank or malformed currency codes produce an error. Exact copies across all original columns trigger a choice before analysis. Identical rows can be legitimate, so check the export before deciding to count them once. Use one non-overlapping export per account and period if you assemble a combined CSV. The app uses binary floating-point arithmetic and rounds displayed amounts to two decimal places. Use fixed-point arithmetic and currency-specific rounding for invoice reconciliation.
 
 The scenario assumes a uniform reduction to the selected baseline. A bill shows charges and credits. An actionable rightsizing proposal also needs resource telemetry, service-level requirements, and pricing or commitment details. Migration ROI additionally needs transition costs and a time horizon.
+
+</details>
 
 ## Sample data attribution
 

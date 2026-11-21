@@ -1,5 +1,22 @@
 # Cloud Cost Investigator interview prep
 
+## Start here if you have three minutes
+
+**Minute 1. Try the app.** It opens with the sample already loaded. In **Overview**, find the USD 20.52 total. In **Investigate**, see which provider and service account for the largest share of spending. In **Savings scenario**, move the slider from 20% to 40% and watch the estimated savings change.
+
+**Minute 2. Learn three ideas.**
+
+- **FOCUS** gives different cloud bills common column names. The app adds up what was billed in one currency, including credits.
+- **A large cost is a place to look.** The app needs two comparable months to tell whether spending jumped. The sample mainly covers one month, so it shows where costs are concentrated.
+- **The slider is a what-if.** A 20% reduction on a USD 100 baseline saves USD 20 and leaves USD 80. To decide if the reduction is realistic, check usage, prices, and performance requirements.
+
+**Minute 3. Say it aloud.** “I used AI to help build a local dashboard that turns cloud billing rows into cost totals by provider and service. Then I used those totals to see where spending is concentrated and model a possible reduction. For a migration, I’d use this to decide what to investigate first.”
+
+If you have one more minute, answer this without reading. “Why can’t you recommend downsizing just because a service is expensive?” A strong answer mentions CPU or memory usage, performance targets, and pricing commitments.
+
+<details>
+<summary>Optional practice and technical details</summary>
+
 ## Follow one bill through the app
 
 1. **Read the CSV.** `app.py` gets bytes from the uploader or the bundled FOCUS sample. `read_billing_csv` checks the header and each record’s field count, then parses finite costs and UTC timestamps. It counts exact repeats using all original columns before retaining the fields the dashboard uses.
@@ -63,3 +80,5 @@ Try these without AI. Predict the output before running anything.
 **45–75 seconds.** Open Savings scenario and move the slider. “The slider multiplies the selected baseline by the reduction percentage and subtracts the savings from the baseline. These are hypothetical savings on the selected records. In a real migration, I’d check utilization, service targets, vendor rates, commitments, and transition costs before recommending a change.”
 
 For further reading, use the [FOCUS 1.0 sample notes](https://github.com/FinOps-Open-Cost-and-Usage-Spec/FOCUS-Sample-Data/tree/main/FOCUS-1.0), [Billed Cost definition](https://focus.finops.org/docs/specification/v1-0/columns/cost-and-usage/billed-cost/), and [Effective Cost definition](https://focus.finops.org/docs/specification/v1-0/columns/cost-and-usage/effective-cost/).
+
+</details>

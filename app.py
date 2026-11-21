@@ -134,21 +134,20 @@ def show_scenario(charges, pairs, months, currency, data_key, sample):
 def main():
     st.set_page_config(page_title="Cloud Cost Investigator", page_icon="📊", layout="wide")
     st.title("Cloud Cost Investigator")
-    st.write("Explore billed cloud costs, investigate cost drivers, and model a potential reduction.")
+    intro = st.container()
+    dashboard = st.container()
 
-    with st.sidebar:
-        st.header("Billing data")
-        upload = st.file_uploader("Upload a FOCUS billing CSV", type="csv")
+    with st.expander("Use your own billing CSV (optional)"):
+        st.caption(f"The app comes with the [FOCUS 1.0 sample]({SAMPLE_SOURCE}), which contains anonymized billing records.")
+        upload = st.file_uploader("Choose a FOCUS billing CSV", type="csv")
         sample = upload is None
-        if sample:
-            st.caption(f"Using the [FOCUS 1.0 sample]({SAMPLE_SOURCE}), anonymized real-world billing records.")
         try:
             content = SAMPLE_PATH.read_bytes() if sample else upload.getvalue()
             data_hash = sha256(content).hexdigest()[:16]
             charges, duplicates = read_billing_csv(content)
             duplicate_mode = None
             if duplicates:
-                st.warning(f"Found {duplicates:,} exact repeated rows. Choose how to count them.")
+                intro.warning(f"Found {duplicates:,} exact repeated rows. Open the CSV options below to choose how to count them.")
                 duplicate_mode = st.radio(
                     "Repeated rows", ["Keep all rows", "Count exact rows once"],
                     index=None, key=f"duplicates-{data_hash}",
@@ -158,23 +157,36 @@ def main():
                 if duplicate_mode == "Count exact rows once":
                     charges, _ = read_billing_csv(content, drop_duplicates=True)
         except (ValueError, OSError) as error:
-            st.error(str(error))
+            intro.error(f"{error} Open the CSV options below to replace the file or return to the sample.")
             st.stop()
 
-        currency = st.selectbox("Billing currency", sorted(charges["BillingCurrency"].unique()), key=f"currency-{data_hash}")
-        st.caption("Each view uses one billing currency. Amounts use BilledCost and include signed credits and adjustments.")
+        currencies = sorted(charges["BillingCurrency"].unique())
+        currency = currencies[0]
+        if len(currencies) > 1:
+            currency = st.selectbox("Billing currency", currencies, key=f"currency-{data_hash}")
+
+    with intro:
+        if sample:
+            st.success("Sample data loaded. You're ready to explore.")
+        else:
+            st.success(f"Your billing CSV is loaded. Showing {currency}.")
+        st.markdown(
+            "**Try it now.** Start in **Overview** to see what was billed. Open **Investigate** "
+            "to find the biggest cost driver, then move the slider in **Savings scenario**."
+        )
 
     data_key = f"{data_hash}-{currency}-{duplicate_mode}"
     charges = charges.loc[charges["BillingCurrency"].eq(currency)]
     pairs = service_totals(charges, SERVICE)
     months = [] if sample else calendar_months(charges)
-    overview, investigation, scenarios = st.tabs(["Overview", "Investigate", "Savings scenario"])
-    with overview:
-        show_overview(charges, pairs, currency)
-    with investigation:
-        show_investigation(charges, pairs, months, currency, data_key, sample)
-    with scenarios:
-        show_scenario(charges, pairs, months, currency, data_key, sample)
+    with dashboard:
+        overview, investigation, scenarios = st.tabs(["Overview", "Investigate", "Savings scenario"])
+        with overview:
+            show_overview(charges, pairs, currency)
+        with investigation:
+            show_investigation(charges, pairs, months, currency, data_key, sample)
+        with scenarios:
+            show_scenario(charges, pairs, months, currency, data_key, sample)
 
 
 if __name__ == "__main__":
